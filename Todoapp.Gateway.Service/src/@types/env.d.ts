@@ -3,7 +3,8 @@ declare global{
         interface ProcessEnv{
             GATEWAY_SERVICE_PORT: string
             PATHFILTER_REGEX: string
-            PATH: string
+            AUTH_PATH: string
+            TARGET: string
         }
     }
 }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import *as dotenv from "dotenv";
-import { createProxyMiddleware, RequestHandler } from "http-proxy-middleware";
+import { createProxyMiddleware} from "http-proxy-middleware";
 
 dotenv.config();
 
@@ -10,11 +10,11 @@ const pathFilter = function (path: string) {
   return path.match(process.env.PATHFILTER_REGEX)?.[0];
 };
 
-const filterdPath = pathFilter(process.env.PATH);
+const filterdPath = pathFilter(process.env.AUTH_PATH);
 
 const apiProxyAuth = createProxyMiddleware({
-  target: 'http://localhost:3005/api',
-  pathFilter: filterdPath
+  target: process.env.TARGET,
+  pathFilter: filterdPath,
 });
 
 router.use(apiProxyAuth);
