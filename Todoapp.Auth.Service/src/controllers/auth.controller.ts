@@ -74,10 +74,6 @@ export const signIn = async (
     const result = await AuthService.login(validatedFields);
 
     req.headers.authorization = result.accessToken;
-    req.headers = {
-      ...req.headers,
-      id: result.user.id,
-    };
 
     res.status(200).json({
       success: true,
