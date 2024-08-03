@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
-export const validateFieldsForRequest = <T>(req: Request, res: Response, validateFields: string[]) => {
+export const validateFieldsForRequest = <T>(req: Request, validateFields: string[]) => {
 
     const missingFields: string[] = []
     const object: Record<string, any> = {}
@@ -32,3 +32,5 @@ export const hashPassword = async (passowrd: string) =>{
 
     return hash;
 }
+
+export const verifyPassword = async (passowrd: string, encrypted: string) => await bcrypt.compare(passowrd, encrypted);
