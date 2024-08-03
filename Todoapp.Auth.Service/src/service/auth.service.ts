@@ -23,6 +23,24 @@ const register = async (user: User) => {
   return result.cas;
 };
 
+const login = async (credentials: Pick<User, "email" | "password">) => {
+  const user = await UserService.getByEmail(credentials.email);
+
+  if (!(await verifyPassword(credentials.password, user.password)))
+    throw new Error("Credentials are wrong");
+
+  delete user.password;
+
+  const accessToken = TokenService.createAccessToken(user);
+  const refreshToken = TokenService.createRefreshToken({ id: user.id });
+
+  return {
+    user,
+    accessToken,
+    refreshToken,
+  };
+};
+
 const AuthService = {
     register
 }
