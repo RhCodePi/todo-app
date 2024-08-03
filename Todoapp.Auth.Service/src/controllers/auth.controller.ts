@@ -31,8 +31,8 @@ export const signUp = async (
     const createdUser = await AuthService.register(validatedFields);
 
     res.status(201).json({
-        success: true,
-        data: {
+      success: true,
+      data: {
         createdUser,
       },
     });
@@ -99,4 +99,43 @@ export const refreshToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    if (req.headers.host !== process.env.HOST_SERVICE) {
+      res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
+      return;
+    }
+    const refreshToken = ["refreshToken"];
+
+    const validatedFields = validateFieldsForRequest<{ refreshToken: string }>(
+      req,
+      refreshToken
+    );
+
+    const result = await AuthService.refreshToken(validatedFields.refreshToken)
+
+    res.status(200).json(
+      {
+        success: true,
+        data: result.accessToken
+      }
+    )
+
+  } catch (error) {
+    if (error instanceof DocumentNotFoundError) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    if(error instanceof Error){
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+};
