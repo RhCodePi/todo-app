@@ -8,6 +8,9 @@ declare global{
             COUCHBASE_PASSWORD: string
             COUCHBASE_BUCKET: string
             COUCHBASE_COLLECTION: string
+            SECRET_KEY: string
+            EXPIRES_IN: string
+            REFRESH_TOKEN_KEY: string
         }
     }
 }
