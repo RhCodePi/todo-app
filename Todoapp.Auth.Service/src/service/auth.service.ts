@@ -1,6 +1,8 @@
 import { User } from "../@types";
 import { getCouchbaseConnection } from "../db";
-import { hashPassword } from "../helpers/utils";
+import { hashPassword, verifyPassword } from "../helpers/utils";
+import TokenService from "./token.service";
+import UserService from "./user.service";
 
 const register = async (user: User) => {
   const { users } = await getCouchbaseConnection();
@@ -13,7 +15,7 @@ const register = async (user: User) => {
 
   const hashedPassword = await hashPassword(user.password);
 
-    const updatedUser = {
+  const updatedUser = {
     ...user,
     password: hashedPassword,
   };
@@ -41,9 +43,26 @@ const login = async (credentials: Pick<User, "email" | "password">) => {
   };
 };
 
+const refreshToken = async (refreshToken: string) => {
+
+  const verifyRefreshToken = TokenService.verifyRefreshToken(refreshToken);
+
+  const user = await UserService.getById(verifyRefreshToken.id);
+
+  delete user.passowrd;
+
+  const accessToken = TokenService.createAccessToken(user);
+
+  return {
+    user,
+    accessToken
+  }
+};
+
 const AuthService = {
-    register
-}
+  register,
+  login,
+  refreshToken
+};
 
-export default AuthService
-
+export default AuthService;
