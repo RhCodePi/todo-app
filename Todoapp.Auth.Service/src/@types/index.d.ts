@@ -16,3 +16,5 @@ export interface Todo {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type SafeUser = Omit<User, 'password'>
