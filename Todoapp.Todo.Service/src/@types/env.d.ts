@@ -8,6 +8,7 @@ declare global {
       COUCHBASE_PASSWORD: string;
       COUCHBASE_BUCKET: string;
       COUCHBASE_COLLECTION: string;
+      COUCHBASE_COLLECTION_DELETED_TODO: string
     }
   }
 }
