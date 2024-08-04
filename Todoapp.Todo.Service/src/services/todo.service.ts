@@ -118,6 +118,17 @@ const getTodo = async (userId: string, todoId: number) => {
   return todo as Todo
 }
 
+const getAll = async (userId: string) => {
+  const user: User = await UserService.getById(userId)
+  
+  if(user.todos?.length === 0)
+    throw new Error("Todo not found")
+
+  return {
+    todos: user.todos
+  }
+}
+
 const getUserTodoIdMax = (user: User) => {
   const todo = user.todos as Todo[];
 
@@ -161,7 +172,8 @@ const getDeletedUserMaxId = async (userId: string) => {
 const TodoService = {
   createTodo,
   deleteTodo,
-  getTodo
+  getTodo,
+  getAll
 };
 
 export default TodoService;
