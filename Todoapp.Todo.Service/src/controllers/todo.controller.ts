@@ -160,3 +160,34 @@ export const getAll = async (
     }
   }
 };
+
+export const getDeletedTodos = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.headers["id"] as string
+
+    const result = await TodoService.getDeletedTodos(userId)
+
+    res.status(200).json({
+      success: true,
+      data: result
+    })
+
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    } else if (error instanceof DocumentExistsError) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    } else if (error instanceof DocumentNotFoundError) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+}

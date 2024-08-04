@@ -101,33 +101,42 @@ const deleteTodo = async (userId: string, todoId: number) => {
 };
 
 const getTodo = async (userId: string, todoId: number) => {
-  const user: User = await UserService.getById(userId)
-  let todo: any
+  const user: User = await UserService.getById(userId);
+  let todo: any;
 
-  if(user.todos?.length === 0)
-    throw new Error("Todo not found")
+  if (user.todos?.length === 0) throw new Error("Todo not found");
 
-   user.todos?.map((element) => {
-    if(element.id === todoId)
-    {
-      todo = element 
-      return
+  user.todos?.map((element) => {
+    if (element.id === todoId) {
+      todo = element;
+      return;
     }
-  })
+  });
 
-  return todo as Todo
-}
+  return todo as Todo;
+};
 
 const getAll = async (userId: string) => {
-  const user: User = await UserService.getById(userId)
-  
-  if(user.todos?.length === 0)
-    throw new Error("Todo not found")
+  const user: User = await UserService.getById(userId);
+
+  if (user.todos?.length === 0) throw new Error("Todo not found");
 
   return {
-    todos: user.todos
-  }
-}
+    todos: user.todos,
+  };
+};
+
+const getDeletedTodos = async (userId: string) => {
+  const { deletedTodos } = await getCouchbaseConnection();
+
+  const content = (await deletedTodos.get(userId)).content;
+
+  if (!content) throw new Error("document is missing");
+
+  const todos = content.todos;
+
+  return todos;
+};
 
 const getUserTodoIdMax = (user: User) => {
   const todo = user.todos as Todo[];
@@ -168,12 +177,12 @@ const getDeletedUserMaxId = async (userId: string) => {
   return maxId;
 };
 
-
 const TodoService = {
   createTodo,
   deleteTodo,
   getTodo,
-  getAll
+  getAll,
+  getDeletedTodos,
 };
 
 export default TodoService;
