@@ -100,6 +100,24 @@ const deleteTodo = async (userId: string, todoId: number) => {
   };
 };
 
+const getTodo = async (userId: string, todoId: number) => {
+  const user: User = await UserService.getById(userId)
+  let todo: any
+
+  if(user.todos?.length === 0)
+    throw new Error("Todo not found")
+
+   user.todos?.map((element) => {
+    if(element.id === todoId)
+    {
+      todo = element 
+      return
+    }
+  })
+
+  return todo as Todo
+}
+
 const getUserTodoIdMax = (user: User) => {
   const todo = user.todos as Todo[];
 
@@ -139,9 +157,11 @@ const getDeletedUserMaxId = async (userId: string) => {
   return maxId;
 };
 
+
 const TodoService = {
   createTodo,
   deleteTodo,
+  getTodo
 };
 
 export default TodoService;
