@@ -10,11 +10,13 @@ export async function getCouchbaseConnection() {
   });
 
   const bucket: Bucket = cluster.bucket(process.env.COUCHBASE_BUCKET);
-  const inventoryScope: Scope = bucket.defaultScope();
-  const users: Collection = inventoryScope.collection(process.env.COUCHBASE_COLLECTION);
+  const defaultScope: Scope = bucket.defaultScope();
+  const users: Collection = defaultScope.collection(process.env.COUCHBASE_COLLECTION);
+  const deletedTodos: Collection = defaultScope.collection(process.env.COUCHBASE_COLLECTION_DELETED_TODO)
 
   return {
     users,
+    deletedTodos,
     cluster,
   };
 }
