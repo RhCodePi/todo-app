@@ -1,5 +1,6 @@
 import { Express } from "express";
 import { getCouchbaseConnection } from "../db";
+import APIError from "../errors/api.error";
 
 const getByEmail = async (email: string) => {
   const { cluster } = await getCouchbaseConnection();
@@ -13,7 +14,8 @@ const getByEmail = async (email: string) => {
     }
   );
 
-  if (queryResult.rows.length === 0) throw new Error("User not found");
+  if (queryResult.rows.length === 0)
+    throw new APIError(404, "NOT_FOUND", "user not exsist");
 
   return queryResult.rows[0];
 };

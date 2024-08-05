@@ -4,7 +4,7 @@ import { validateFieldsForRequest } from "../helpers/utils";
 
 import * as dotenv from "dotenv";
 import AuthService from "../service/auth.service";
-import { DocumentExistsError, DocumentNotFoundError } from "couchbase";
+import APIError from "../errors/api.error";
 dotenv.config();
 
 export const signUp = async (
@@ -14,11 +14,11 @@ export const signUp = async (
 ) => {
   try {
     if (req.headers.host !== process.env.HOST_SERVICE) {
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-      });
-      return;
+      return new APIError(
+        500,
+        "INTERNAL_SERVER_ERROR",
+        "host server does not exsist"
+      );
     }
 
     const requiredFields = ["id", "email", "password", "name", "lastname"];
@@ -37,17 +37,7 @@ export const signUp = async (
       },
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: "document already exists",
-      });
-    }
+    next(error);
   }
 };
 
@@ -58,11 +48,11 @@ export const signIn = async (
 ) => {
   try {
     if (req.headers.host !== process.env.HOST_SERVICE) {
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-      });
-      return;
+      return new APIError(
+        500,
+        "INTERNAL_SERVER_ERROR",
+        "host server does not exsist"
+      );
     }
 
     const requiredFields = ["email", "password"];
@@ -82,12 +72,7 @@ export const signIn = async (
       refreshToken: result.refreshToken,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };
 
@@ -98,11 +83,11 @@ export const refreshToken = async (
 ) => {
   try {
     if (req.headers.host !== process.env.HOST_SERVICE) {
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-      });
-      return;
+      return new APIError(
+        500,
+        "INTERNAL_SERVER_ERROR",
+        "host server does not exsist"
+      );
     }
     const refreshToken = ["refreshToken"];
 
@@ -111,27 +96,13 @@ export const refreshToken = async (
       refreshToken
     );
 
-    const result = await AuthService.refreshToken(validatedFields.refreshToken)
+    const result = await AuthService.refreshToken(validatedFields.refreshToken);
 
-    res.status(200).json(
-      {
-        success: true,
-        data: result.accessToken
-      }
-    )
-
+    res.status(200).json({
+      success: true,
+      data: result.accessToken,
+    });
   } catch (error) {
-    if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-    if(error instanceof Error){
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };

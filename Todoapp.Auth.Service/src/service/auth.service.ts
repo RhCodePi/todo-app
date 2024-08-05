@@ -1,5 +1,6 @@
 import { User } from "../@types";
 import { getCouchbaseConnection } from "../db";
+import APIError from "../errors/api.error";
 import { hashPassword, verifyPassword } from "../helpers/utils";
 import TokenService from "./token.service";
 import UserService from "./user.service";
@@ -9,9 +10,8 @@ const register = async (user: User) => {
 
   const isEmailExists = await users.exists(user.email);
 
-  if (isEmailExists.exists) {
-    throw new Error("email already exists");
-  }
+  if (isEmailExists.exists)
+    throw new APIError(400, "EMAIL_INVALID", "email already exists");
 
   const hashedPassword = await hashPassword(user.password);
 
@@ -29,7 +29,7 @@ const login = async (credentials: Pick<User, "email" | "password">) => {
   const user = await UserService.getByEmail(credentials.email);
 
   if (!(await verifyPassword(credentials.password, user.password)))
-    throw new Error("Credentials are wrong");
+    throw new APIError(400, "CREDENTIALS_INVALID", "Credentials are wrong");
 
   delete user.password;
 
@@ -44,7 +44,6 @@ const login = async (credentials: Pick<User, "email" | "password">) => {
 };
 
 const refreshToken = async (refreshToken: string) => {
-
   const verifyRefreshToken = TokenService.verifyRefreshToken(refreshToken);
 
   const user = await UserService.getById(verifyRefreshToken.id);
@@ -55,14 +54,14 @@ const refreshToken = async (refreshToken: string) => {
 
   return {
     user,
-    accessToken
-  }
+    accessToken,
+  };
 };
 
 const AuthService = {
   register,
   login,
-  refreshToken
+  refreshToken,
 };
 
 export default AuthService;
