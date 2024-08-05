@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import { validateFieldsForRequest } from "../helpers/utils";
 import { Todo } from "../@types";
 import TodoService from "../services/todo.service";
-import { DocumentExistsError, DocumentNotFoundError } from "couchbase";
+import APIError from "../errros/api.error";
 
 dotenv.config();
 
@@ -14,11 +14,7 @@ export const createTodo = async (
 ) => {
   try {
     if (req.headers.host !== process.env.HOST_SERVICE) {
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-      });
-      return;
+      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
     }
 
     const id = req.headers["id"] as string;
@@ -36,22 +32,7 @@ export const createTodo = async (
       data: result.todo,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };
 
@@ -61,6 +42,9 @@ export const deleteTodo = async (
   next: NextFunction
 ) => {
   try {
+    if (req.headers.host !== process.env.HOST_SERVICE) {
+      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
+    }
     const userId = req.headers["id"] as string;
 
     const todoId = parseInt(req.params.id.slice(1));
@@ -72,22 +56,7 @@ export const deleteTodo = async (
       data: result.data,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };
 
@@ -97,6 +66,9 @@ export const getTodo = async (
   next: NextFunction
 ) => {
   try {
+    if (req.headers.host !== process.env.HOST_SERVICE) {
+      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
+    }
     const userId = req.headers["id"] as string;
 
     const todoId = parseInt(req.params.id.slice(1));
@@ -108,22 +80,7 @@ export const getTodo = async (
       data: result,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };
 
@@ -133,61 +90,40 @@ export const getAll = async (
   next: NextFunction
 ) => {
   try {
+    if (req.headers.host !== process.env.HOST_SERVICE) {
+      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
+    }
     const userId = req.headers["id"] as string;
 
-    const result = await TodoService.getAll(userId)
+    const result = await TodoService.getAll(userId);
 
     res.status(200).json({
       success: true,
-      data: result.todos
-    })
+      data: result.todos,
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
 };
 
-export const getDeletedTodos = async (req: Request, res: Response, next: NextFunction) => {
+export const getDeletedTodos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const userId = req.headers["id"] as string
+    if (req.headers.host !== process.env.HOST_SERVICE) {
+      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
+    }
+    const userId = req.headers["id"] as string;
 
-    const result = await TodoService.getDeletedTodos(userId)
+    const result = await TodoService.getDeletedTodos(userId);
 
     res.status(200).json({
       success: true,
-      data: result
-    })
-
+      data: result,
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentExistsError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    } else if (error instanceof DocumentNotFoundError) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    next(error);
   }
-}
+};

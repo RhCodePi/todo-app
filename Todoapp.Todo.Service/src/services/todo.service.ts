@@ -1,5 +1,6 @@
 import { Todo, User } from "../@types";
 import { getCouchbaseConnection } from "../db";
+import APIError from "../errros/api.error";
 import UserService from "./user.service";
 
 const createTodo = async (
@@ -50,7 +51,7 @@ const deleteTodo = async (userId: string, todoId: number) => {
 
   const user: User = await UserService.getById(userId);
 
-  if (!user) throw new Error("user not found");
+  if (!user.todos) throw new APIError(400, "NOT_FOUND", "todos not found");
 
   const todo = user.todos?.find((element) => {
     if (element.id === todoId) {
@@ -58,7 +59,7 @@ const deleteTodo = async (userId: string, todoId: number) => {
     }
   });
 
-  if (!todo) throw new Error("todo not exists");
+  if (!todo) throw new APIError(400, "NOT_FOUND", "todo not exsist");
 
   const index = user.todos?.indexOf(todo, 0) as number;
   if (index > -1) {
@@ -102,9 +103,13 @@ const deleteTodo = async (userId: string, todoId: number) => {
 
 const getTodo = async (userId: string, todoId: number) => {
   const user: User = await UserService.getById(userId);
-  let todo: any;
 
-  if (user.todos?.length === 0) throw new Error("Todo not found");
+  let todo!: Todo;
+
+  if (!user.todos) throw new APIError(400, "NOT_FOUND", "todos not found");
+
+  if (user.todos?.length === 0)
+    throw new APIError(400, "NOT_FOUND", "todo not found in user");
 
   user.todos?.map((element) => {
     if (element.id === todoId) {
@@ -113,13 +118,18 @@ const getTodo = async (userId: string, todoId: number) => {
     }
   });
 
-  return todo as Todo;
+  if (!todo) throw new APIError(400, "NOT_FOUND", "todo not exsist");
+
+  return todo;
 };
 
 const getAll = async (userId: string) => {
   const user: User = await UserService.getById(userId);
 
-  if (user.todos?.length === 0) throw new Error("Todo not found");
+  if (!user.todos) throw new APIError(400, "NOT_FOUND", "todos not found");
+
+  if (user.todos?.length === 0)
+    throw new APIError(400, "NOT_FOUND", "todo not found in user");
 
   return {
     todos: user.todos,
@@ -131,7 +141,8 @@ const getDeletedTodos = async (userId: string) => {
 
   const content = (await deletedTodos.get(userId)).content;
 
-  if (!content) throw new Error("document is missing");
+  if (!content)
+    throw new APIError(400, "DOCUMENT_MISSING", "document is missing");
 
   const todos = content.todos;
 
