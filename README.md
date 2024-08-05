@@ -1,5 +1,59 @@
 # TODO Uygulamasi
 
+## Requirements
+- [Docker-Desktop](https://www.docker.com/products/docker-desktop/)
+- [Docker-Compose](https://docs.docker.com/compose/install/)
+- [NodeJS](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs) 
+- [Postman](https://www.postman.com/downloads/)
+
+## Getting Started
+
+Clone this repository to your local machine:
+
+```bash
+  git clone https://github.com/RhCodePi/todo-app.git
+```
+Go to the created folder:
+
+```bash
+  cd todo-app
+```
+
+### Start to docker
+Start to couchbase server on Docker
+
+> Make sure to docker is runnig before execute the command
+
+``` bash
+  docker compose up -d
+```
+
+To stop the server
+```bash
+  docker compose down
+```
+
+### Installing
+
+> Please make sure to install dependencies in each service directory.
+
+Go to the server directory
+``` bash
+  cd Todoapp.Auth.Service
+```
+
+Install dependencies:
+``` bash
+  npm install
+```
+
+Start to Auth Server: 
+```bash 
+  npm run dev
+```
+
+>  Make sure that all services are running simultaneously.
+
 ## Services
 
 ### Auth Service
