@@ -4,7 +4,6 @@ import { validateFieldsForRequest } from "../helpers/utils";
 
 import * as dotenv from "dotenv";
 import AuthService from "../service/auth.service";
-import APIError from "../errors/api.error";
 dotenv.config();
 
 export const signUp = async (
@@ -13,14 +12,6 @@ export const signUp = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      return new APIError(
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "host server does not exsist"
-      );
-    }
-
     const requiredFields = ["id", "email", "password", "name", "lastname"];
 
     const validatedFields = validateFieldsForRequest<User>(
@@ -47,14 +38,6 @@ export const signIn = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      return new APIError(
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "host server does not exsist"
-      );
-    }
-
     const requiredFields = ["email", "password"];
 
     const validatedFields = validateFieldsForRequest<
@@ -82,13 +65,6 @@ export const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      return new APIError(
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "host server does not exsist"
-      );
-    }
     const refreshToken = ["refreshToken"];
 
     const validatedFields = validateFieldsForRequest<{ refreshToken: string }>(
