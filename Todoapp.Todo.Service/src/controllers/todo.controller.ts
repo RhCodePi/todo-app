@@ -3,7 +3,6 @@ import * as dotenv from "dotenv";
 import { validateFieldsForRequest } from "../helpers/utils";
 import { Todo } from "../@types";
 import TodoService from "../services/todo.service";
-import APIError from "../errros/api.error";
 
 dotenv.config();
 
@@ -13,10 +12,6 @@ export const createTodo = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
-    }
-
     const id = req.headers["id"] as string;
 
     const requiredFields = ["text", "expireDate"];
@@ -42,18 +37,15 @@ export const deleteTodo = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
-    }
     const userId = req.headers["id"] as string;
 
-    const todoId = parseInt(req.params.id.slice(1));
+    const todoId = parseInt(req.params.id.slice(1)); // :2
 
-    const result = await TodoService.deleteTodo(userId, todoId);
+    const {data} = await TodoService.deleteTodo(userId, todoId);
 
     res.status(200).json({
       success: true,
-      data: result.data,
+      data,
     });
   } catch (error) {
     next(error);
@@ -66,12 +58,9 @@ export const getTodo = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
-    }
     const userId = req.headers["id"] as string;
 
-    const todoId = parseInt(req.params.id.slice(1));
+    const todoId = parseInt(req.params.id.slice(1)); // 
 
     const result = await TodoService.getTodo(userId, todoId);
 
@@ -90,9 +79,6 @@ export const getAll = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
-    }
     const userId = req.headers["id"] as string;
 
     const result = await TodoService.getAll(userId);
@@ -112,9 +98,6 @@ export const getDeletedTodos = async (
   next: NextFunction
 ) => {
   try {
-    if (req.headers.host !== process.env.HOST_SERVICE) {
-      throw new APIError(500, "INTERNAL_SERVER_ERROR", "server not found");
-    }
     const userId = req.headers["id"] as string;
 
     const result = await TodoService.getDeletedTodos(userId);
